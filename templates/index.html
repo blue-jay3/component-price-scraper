@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Scraper</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Price Scraper</h1>
+    <form action="/prices">
+        <input type="text" name="search" id="search" placeholder="Search for a product">
+        
+        <p>Specify a category:</p>
+
+        <input type="checkbox" id="desktop" name="desktop" value="7">
+        <label for="desktop">Desktop Computers</label> <br>
+        <input type="checkbox" id="graphics-card" name="graphics-card" value="43">
+        <label for="graphics-card">Graphics Cards</label> <br>
+        <input type="checkbox" id="laptop" name="laptop" value="710">
+        <label for="laptop">Laptops, Tablets</label> <br>
+        <input type="checkbox" id="cooling" name="cooling" value="8">
+        <label for="cooling">PC Cooling &amp; Fans</label> <br>
+        <input type="checkbox" id="cables" name="cables" value="5">
+        <label for="cables">Cables &amp; Adapters</label> <br> <br>
+
+        <button type="submit">Search</button>
+    </form>
+    
+</body>
+</html>
