@@ -12,18 +12,20 @@ def index():
 @app.route('/prices')
 def get_lowest_price():
     item = request.args.get('search')
+    cpath = request.args.get('category')
 
     if item == None or item.strip() == "":
         item = "rtx 4070"
 
-    item_info = update_prices(item, "")
+    item_info = update_prices(item, cpath)
 
     if item_info != None and item_info != []:
         return render_template(
             'prices.html',
             title=item,
-            name=item_info[1].upper(),
-            price="$" + str(item_info[2])
+            #name=item_info[1].upper(),
+            #price="$" + str(item_info[2])
+            records=item_info
         )
     else:
         return render_template(

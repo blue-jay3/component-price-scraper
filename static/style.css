@@ -5,3 +5,67 @@
     font-weight: 400;
     font-style: normal;
 }
+
+#heading {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 5px;
+    font-size: 35px;
+}
+
+#subheading {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 25px;
+}
+
+#search, #search-label {
+    margin-right: 55px;
+}
+
+#submit-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+form {
+    display: block;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    height: fit-content;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+ul {
+    list-style: none;
+}
+
+li {
+    margin-bottom: 20px;
+    padding: 12px;
+    border: 1px solid;
+    border-radius: 20px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+#result-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    height: fit-content;
+    margin: 0 auto;
+}
+
+i {
+    margin-right: 5px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.bx-link {
+    margin-right: 10px;
+}

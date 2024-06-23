@@ -13,6 +13,8 @@ def connect_to_database():
 
 def update_prices(search, cpath):
     cursor, connection = connect_to_database()
+    cursor.execute("TRUNCATE TABLE price_records;")
+    connection.commit()
 
     if cpath != "":
         cpath = "&cpath=" + cpath
@@ -33,11 +35,15 @@ def update_prices(search, cpath):
         price = element.findAll("span", attrs={"class":["d-block", "mb-0", "pq-hdr-product_price"]})
 
         # save the product info to the database
-        if search in variable.text.lower():
-            cursor.execute(f"""INSERT INTO price_records VALUES (TIMESTAMP '{today}', '{variable.text}', {price[1].text[1:].replace(",", "")});""")
+        cursor.execute(f"""INSERT INTO price_records VALUES (TIMESTAMP '{today}', '{variable.text}', {price[1].text[1:].replace(",", "")});""")
 
     connection.commit()
-    return get_lowest()
+
+    cursor.execute("SELECT product_name, price from price_records;")
+    records = cursor.fetchall()
+    records.sort(key=lambda x: x[1]) # sort by price
+
+    return records
 
 def get_lowest():
     cursor, _ = connect_to_database()
