@@ -69,3 +69,13 @@ i {
 .bx-link {
     margin-right: 10px;
 }
+
+.bx-home {
+    margin: 10px;
+    font-size: 35px;
+}
+
+a {
+    color: black;
+    text-decoration: none; /* no underline */
+}

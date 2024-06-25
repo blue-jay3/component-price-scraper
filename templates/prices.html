@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Price Scraper</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel='stylesheet' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'>
 </head>
 <body>
-    <h1 id="heading">Price Scraper</h1>
+    <h1 id="heading"><a href="{{ url_for('index') }}"><i class='bx bx-home'></i></a>Price Scraper</h1>
     <form action="/prices">
         <label for="search" id="search-label">Search for a product :</label>
         <label for="category" id="category-label">Specify a category :</label> <br>
@@ -32,8 +32,10 @@
 
     <div id="result-list">
         <ul>
-        {% for name, price in records %}
-            <li><i class='bx bx-pin'></i><i class='bx bx-link'></i>{{ name }} : ${{ price }}</li>
+        {% for name, price, url in records %}
+            <li>
+                <a href="{{ url_for('pin_item', product_name=name, product_price=price, product_url=url) }}"><i class='bx bx-pin' onclick="classList.toggle('bx-pin'); classList.toggle('bxs-pin');"></i></a>
+                <a href="{{ url }}" target="_blank"><i class='bx bx-link'></i></a>{{ name }} : ${{ price }}</li>
         {% endfor %}
         </ul>
     </div>
