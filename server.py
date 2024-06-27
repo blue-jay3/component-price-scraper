@@ -18,8 +18,11 @@ def pin_item():
     name = request.args.get('product_name')
     price = request.args.get('product_price')
     url = request.args.get('product_url')
+    search_terms = request.args.get('search_terms')
+    selected_category = request.args.get('selected_category')
+    current_page = request.args.get('current_page')
     pin(name, price, url)
-    return redirect("/prices")
+    return redirect(url_for(current_page, search=search_terms, category=selected_category)) #
 
 @app.route('/graph')
 def show_graph():
@@ -46,6 +49,7 @@ def get_lowest_price():
         return render_template(
             'prices.html',
             title=current_search,
+            category=current_category,
             records=item_info
         )
     else: # fix

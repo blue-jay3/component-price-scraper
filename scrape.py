@@ -78,7 +78,7 @@ def updatePinnedPrices(): # schedule to call this each day to update all pinned 
             cursor.execute(f"""INSERT INTO pinned_item_price_records VALUES (DATE '{todayDate}', '{product_name_list[0]}', {price.replace("$", "").replace(",", "")});""")
             connection.commit()
         else:
-            print("Price already logged on " + str(todayDate))
+            print("Price for " + product_name_list[0] + " already logged on " + str(todayDate))
     
     cursor.close()
     connection.close()
@@ -89,11 +89,17 @@ def saveCurrentPrice(name, price):
 
     cursor.execute(f"SELECT date FROM pinned_item_price_records WHERE product_name='{name}';")
     dates = cursor.fetchall()
-    if len(dates) == 0 or todayDate not in dates[0]:
+
+    dates_list = []
+
+    for i in range(len(dates)):
+        dates_list.append(list(dates[i])[0].isoformat())
+
+    if len(dates_list) == 0 or str(todayDate) not in dates_list:
         cursor.execute(f"INSERT INTO pinned_item_price_records VALUES (DATE '{todayDate.isoformat()}', '{name}', {price});")
         connection.commit()
     else:
-        print("Price already logged on " + str(todayDate.isoformat()))
+        print("Price for " + name + " already logged on " + str(todayDate.isoformat()))
 
     cursor.close()
 
@@ -139,18 +145,25 @@ def update_prices(search, cpath):
 
     today = datetime.now()
 
+    pinned_items = list(get_pinned())
+    pinned_item_names = []
+    for item in pinned_items:
+        pinned_item_names.append(item[0])
+
     for element in products:
         # get the name and price of each product
         item_name = element.find("span", attrs={"class":["text-dark", "d-block", "productTemplate_title"]})
         variable = item_name.find("a", attrs={"class":["text-dark", "text-truncate_3"]})
         price = element.findAll("span", attrs={"class":["d-block", "mb-0", "pq-hdr-product_price"]})
 
+        pinned = 'bxs-pin' if variable.text in pinned_item_names else 'bx-pin'
+
         # save the product info to the database
-        cursor.execute(f"""INSERT INTO search_results VALUES (TIMESTAMP '{today}', '{variable.text}', {price[1].text[1:].replace(",", "")}, '{variable.get('href')}');""")
+        cursor.execute(f"""INSERT INTO search_results VALUES (TIMESTAMP '{today}', '{variable.text}', {price[1].text[1:].replace(",", "")}, '{variable.get('href')}', '{pinned}');""")
 
     connection.commit()
 
-    cursor.execute("SELECT product_name, price, url from search_results;")
+    cursor.execute("SELECT product_name, price, url, pinned from search_results;")
     records = cursor.fetchall()
     records.sort(key=lambda x: x[1]) # sort by price
 

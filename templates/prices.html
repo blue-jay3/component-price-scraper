@@ -32,9 +32,9 @@
 
     <div id="result-list">
         <ul>
-        {% for name, price, url in records %}
-            <li>
-                <a href="{{ url_for('pin_item', product_name=name, product_price=price, product_url=url) }}"><i class='bx bx-pin' onclick="classList.toggle('bx-pin'); classList.toggle('bxs-pin');"></i></a>
+        {% for name, price, url, pin in records %}
+            <li> <!--onclick="classList.toggle('bx-pin'); classList.toggle('bxs-pin');"-->
+                <a href="{{ url_for('pin_item', product_name=name, product_price=price, product_url=url, search_terms=title, selected_category=category, current_page='get_lowest_price') }}"><i class='bx {{ pin }}' onclick="classList.toggle('bx-pin'); classList.toggle('bxs-pin');"></i></a>
                 <a href="{{ url }}" target="_blank"><i class='bx bx-link'></i></a>{{ name }} : ${{ price }}</li>
         {% endfor %}
         </ul>
