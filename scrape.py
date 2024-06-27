@@ -4,6 +4,11 @@ import psycopg2
 from datetime import date, datetime
 from settings import *
 
+from plotly.offline import plot
+from plotly.graph_objs import Scatter
+import plotly.express as px
+
+
 def connect_to_database():
     # connect to postgresql database
     connection = psycopg2.connect(database=DATABASE_NAME, user=DATABASE_USER, password=DATABASE_PASSWORD, host=DATABASE_HOST, port=DATABASE_PORT)
@@ -11,24 +16,66 @@ def connect_to_database():
 
     return cursor, connection
 
+def get_pinned():
+    cursor, _ = connect_to_database()
+
+    cursor.execute(f"SELECT product_name FROM pinned_items;")
+    pinned_products = cursor.fetchall()
+    cursor.execute(f"SELECT url FROM pinned_items;")
+    pinned_urls = cursor.fetchall()
+
+    for i in range(len(pinned_products)):
+        item_as_list = list(pinned_products[i])
+        cursor.execute(f"SELECT price FROM pinned_item_price_records WHERE product_name='{item_as_list[0]}' ORDER BY date;")
+        price = cursor.fetchone()
+        pinned_products[i] = pinned_products[i] + tuple(price) + pinned_urls[i]
+
+    cursor.close()
+    return pinned_products
+
+def get_graph(name):
+    cursor, _ = connect_to_database()
+
+    cursor.execute(f"SELECT date, price FROM pinned_item_price_records WHERE product_name='{name}';")
+    records = cursor.fetchall()
+    zipped_records = list(map(list, zip(*records)))
+    dates = zipped_records[0]
+    prices = zipped_records[1]
+
+    fig = px.line(x=dates, y=prices, markers=True, width=1000, height=500)
+    fig.update_xaxes(type='category')
+    fig.update_layout(xaxis_title="Date", yaxis_title="Price ($CAD)")
+    prices_graph_div = plot(fig, output_type='div')
+
+    #prices_graph_div = plot([Scatter(x=dates, y=prices)], output_type='div')
+    cursor.close()
+    return prices_graph_div
+
 def updatePinnedPrices(): # schedule to call this each day to update all pinned prices
     todayDate = date.today().isoformat()
     cursor, connection = connect_to_database()
 
-    cursor.execute("SELECT DISTINCT product_name FROM pinned_item_price_records;")
+    cursor.execute("SELECT DISTINCT product_name FROM pinned_items;")
 
     records = cursor.fetchall()
     for row in records:
-        cursor.execute(f"SELECT url FROM pinned_items WHERE product_name='{row['product_name']}';")
-        url = cursor.fetchone()
+        product_name_list = list(row)
+        cursor.execute(f"SELECT url FROM pinned_items WHERE product_name='{product_name_list[0]}';")
+        url = list(cursor.fetchone())[0]
         page_to_scrape = requests.get(url)
         soup = BeautifulSoup(page_to_scrape.content, 'html5lib')
 
-        cursor.execute(f"SELECT date FROM pinned_item_price_records WHERE product_name='{row['product_name']}';")
+        cursor.execute(f"SELECT date FROM pinned_item_price_records WHERE product_name='{product_name_list[0]}';")
         dates = cursor.fetchall()
-        if todayDate not in dates:
+
+        dates_list = []
+
+        for i in range(len(dates)):
+            dates_list.append(list(dates[i])[0].isoformat())
+
+        if len(dates_list) == 0 or todayDate not in dates_list:
             price = soup.findAll("span", attrs={"class":"h2-big"})[0].text
-            cursor.execute(f"INSERT INTO pinned_item_price_records VALUES (DATE '{todayDate}', '{row['product_name']}', {price});")
+            cursor.execute(f"""INSERT INTO pinned_item_price_records VALUES (DATE '{todayDate}', '{product_name_list[0]}', {price.replace("$", "").replace(",", "")});""")
             connection.commit()
         else:
             print("Price already logged on " + str(todayDate))
@@ -135,16 +182,18 @@ def view_database():
 if __name__ == "__main__":
     cursor, connection = connect_to_database()
 
-    search = input("\nSearch for a product: ")
+    #search = input("\nSearch for a product: ")
 
-    if search == None or search.strip() == "":
-        search = "rtx 4070"
+    #if search == None or search.strip() == "":
+    #    search = "rtx 4070"
 
-    results = update_prices(search, "")
-    if results != None:
-        print(update_prices(search, ""))
-    else:
-        print("No search results found")
+    #results = update_prices(search, "")
+    #if results != None:
+    #    print(update_prices(search, ""))
+    #else:
+    #    print("No search results found")
+
+    updatePinnedPrices()
 
     # save database changes and close connection
     connection.commit()

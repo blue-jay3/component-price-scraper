@@ -1,5 +1,6 @@
 from flask import Flask, redirect, render_template, request, url_for
-from scrape import update_prices, pin
+from markupsafe import Markup
+from scrape import update_prices, pin, get_graph, get_pinned
 from waitress import serve
 
 app = Flask(__name__)
@@ -9,7 +10,8 @@ current_category = ""
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    pinned_records = get_pinned()
+    return render_template('index.html', pinned=pinned_records)
 
 @app.route('/pin') # ?
 def pin_item():
@@ -18,6 +20,13 @@ def pin_item():
     url = request.args.get('product_url')
     pin(name, price, url)
     return redirect("/prices")
+
+@app.route('/graph')
+def show_graph():
+    item_name = request.args.get('product_name')
+    graph_div = Markup(get_graph(item_name))
+
+    return render_template('graph.html', graph=graph_div, name=item_name)
 
 @app.route('/prices')
 def get_lowest_price():

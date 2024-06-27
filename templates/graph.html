@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Scraper</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel='stylesheet' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'>
+</head>
+<body>
+    <h1 id="heading"><a href="{{ url_for('index') }}"><i class='bx bx-arrow-back'></i></a>Price Scraper</h1>
+
+    <h3 id="graph-subheading">{{ name }}</h3>
+    <div id="graph-container">
+        {{ graph }}
+    </div>
+</body>
+</html>

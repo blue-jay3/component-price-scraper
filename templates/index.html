@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Price Scraper</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel='stylesheet' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'>
 </head>
 <body>
     <h1 id="heading">Price Scraper</h1>
@@ -26,5 +27,18 @@
             <button type="submit" id="submit-button">Search</button>
         </div>
     </form>
+
+    <h1 id="subheading">{{ title }} prices</h1> <!-- will fill in with "'rtx 4070' prices" -->
+
+    <div id="result-list">
+        <ul>
+        {% for name, price, url in pinned %}
+            <li>
+                <a href="{{ url_for('pin_item', product_name=name, product_price=price, product_url=url) }}"><i class='bx bx-pin' onclick="classList.toggle('bx-pin'); classList.toggle('bxs-pin');"></i></a>
+                <a href="{{ url }}" target="_blank"><i class='bx bx-link'></i></a>{{ name }} : ${{ price }} <a href="{{ url_for('show_graph', product_name=name) }}"><i class='bx bx-line-chart'></i></a></li>
+        {% endfor %}
+        </ul>
+    </div>
+
 </body>
 </html>
